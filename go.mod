@@ -1,4 +1,4 @@
-module github.com/atamanroman/musiccast
+module github.com/atamanroman/ymc
 
 go 1.20
 

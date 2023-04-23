@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/atamanroman/musiccast/src/internal/ssdp"
+	"github.com/atamanroman/ymc/src/internal/ssdp"
 	"net"
 	"strconv"
 	"strings"

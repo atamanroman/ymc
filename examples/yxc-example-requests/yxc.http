@@ -1,0 +1,19 @@
+###
+
+GET {{target}}/YamahaExtendedControl/v1/system/getFeatures
+
+###
+
+GET {{target}}/YamahaExtendedControl/v1/system/getDeviceInfo
+
+###
+
+GET {{target}}/YamahaExtendedControl/v1/system/getLocationInfo
+
+###
+
+GET {{target}}/YamahaExtendedControl/v1/{{zone}}/getStatus
+
+###
+
+GET {{target}}/YamahaExtendedControl/v1/{{zone}}/setPower?power=on

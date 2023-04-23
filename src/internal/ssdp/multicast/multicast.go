@@ -2,7 +2,7 @@ package multicast
 
 import (
 	"errors"
-	"github.com/atamanroman/musiccast/src/internal/ssdp/ssdplog"
+	"github.com/atamanroman/ymc/src/internal/ssdp/ssdplog"
 	"io"
 	"net"
 	"strings"

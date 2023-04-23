@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	multicast2 "github.com/atamanroman/musiccast/src/internal/ssdp/multicast"
-	"github.com/atamanroman/musiccast/src/internal/ssdp/ssdplog"
+	"github.com/atamanroman/ymc/src/internal/ssdp/multicast"
+	"github.com/atamanroman/ymc/src/internal/ssdp/ssdplog"
 	"net"
 	"net/http"
 	"time"
@@ -24,7 +24,7 @@ const (
 // Search searches services by SSDP.
 func Search(searchType string, waitSec int, ch chan<- *Service) error {
 	// dial multicast UDP packet.
-	conn, err := multicast2.Listen(&multicast2.AddrResolver{Addr: "0.0.0.0:0"})
+	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: "0.0.0.0:0"})
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func Search(searchType string, waitSec int, ch chan<- *Service) error {
 	ssdplog.Printf("search on %s", conn.LocalAddr().String())
 
 	// send request.
-	addr, err := multicast2.SendAddr()
+	addr, err := multicast.SendAddr()
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func Search(searchType string, waitSec int, ch chan<- *Service) error {
 	if err != nil {
 		return err
 	}
-	if _, err := conn.WriteTo(multicast2.BytesDataProvider(msg), addr); err != nil {
+	if _, err := conn.WriteTo(multicast.BytesDataProvider(msg), addr); err != nil {
 		return err
 	}
 
