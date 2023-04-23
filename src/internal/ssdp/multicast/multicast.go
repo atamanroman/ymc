@@ -2,7 +2,7 @@ package multicast
 
 import (
 	"errors"
-	ssdplog "github.com/atamanroman/musiccast/src/ssdp/ssdplog"
+	"github.com/atamanroman/musiccast/src/internal/ssdp/ssdplog"
 	"io"
 	"net"
 	"strings"
@@ -22,7 +22,7 @@ type Conn struct {
 // Listen starts to receiving multicast messages.
 func Listen(r *AddrResolver) (*Conn, error) {
 	// prepare parameters.
-	laddr, err := r.resolve()
+	laddr, err := r.Resolve()
 	if err != nil {
 		return nil, err
 	}

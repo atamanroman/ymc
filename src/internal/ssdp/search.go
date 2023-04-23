@@ -5,72 +5,26 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/atamanroman/musiccast/src/ssdp/multicast"
-	"github.com/atamanroman/musiccast/src/ssdp/ssdplog"
+	multicast2 "github.com/atamanroman/musiccast/src/internal/ssdp/multicast"
+	"github.com/atamanroman/musiccast/src/internal/ssdp/ssdplog"
 	"net"
 	"net/http"
-	"regexp"
-	"strconv"
 	"time"
 )
-
-// Service is discovered service.
-type Service struct {
-	// Type is a property of "ST"
-	Type string
-
-	// USN is a property of "USN"
-	USN string
-
-	// Location is a property of "LOCATION"
-	Location string
-
-	// Server is a property of "SERVER"
-	Server string
-
-	rawHeader http.Header
-	maxAge    *int
-}
-
-var rxMaxAge = regexp.MustCompile(`\bmax-age\s*=\s*(\d+)\b`)
-
-func extractMaxAge(s string, value int) int {
-	v := value
-	if m := rxMaxAge.FindStringSubmatch(s); m != nil {
-		i64, err := strconv.ParseInt(m[1], 10, 32)
-		if err == nil {
-			v = int(i64)
-		}
-	}
-	return v
-}
-
-// MaxAge extracts "max-age" value from "CACHE-CONTROL" property.
-func (s *Service) MaxAge() int {
-	if s.maxAge == nil {
-		s.maxAge = new(int)
-		*s.maxAge = extractMaxAge(s.rawHeader.Get("CACHE-CONTROL"), -1)
-	}
-	return *s.maxAge
-}
-
-// Header returns all properties in response of search.
-func (s *Service) Header() http.Header {
-	return s.rawHeader
-}
 
 const (
 	// All is a search type to search all services and devices.
 	All = "ssdp:all"
 
 	// RootDevice is a search type to search UPnP root devices.
-	RootDevice = "upnp:rootdevice"
+	RootDevice        = "upnp:rootdevice"
+	UpnpMediaRenderer = "urn:schemas-upnp-org:device:MediaRenderer:1"
 )
 
 // Search searches services by SSDP.
-func Search(searchType string, waitSec int, localAddr string, ch chan *Service) error {
+func Search(searchType string, waitSec int, ch chan<- *Service) error {
 	// dial multicast UDP packet.
-	conn, err := multicast.Listen(&multicast.AddrResolver{Addr: localAddr})
+	conn, err := multicast2.Listen(&multicast2.AddrResolver{Addr: "0.0.0.0:0"})
 	if err != nil {
 		return err
 	}
@@ -78,7 +32,7 @@ func Search(searchType string, waitSec int, localAddr string, ch chan *Service) 
 	ssdplog.Printf("search on %s", conn.LocalAddr().String())
 
 	// send request.
-	addr, err := multicast.SendAddr()
+	addr, err := multicast2.SendAddr()
 	if err != nil {
 		return err
 	}
@@ -86,7 +40,7 @@ func Search(searchType string, waitSec int, localAddr string, ch chan *Service) 
 	if err != nil {
 		return err
 	}
-	if _, err := conn.WriteTo(multicast.BytesDataProvider(msg), addr); err != nil {
+	if _, err := conn.WriteTo(multicast2.BytesDataProvider(msg), addr); err != nil {
 		return err
 	}
 
