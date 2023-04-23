@@ -2,28 +2,31 @@ package main
 
 import (
 	"fmt"
+	"github.com/atamanroman/ymc/src/internal/logging"
 	"github.com/atamanroman/ymc/src/musiccast"
 	"sort"
 	"time"
 )
 
 var Speakers = make(map[string]*musiccast.Speaker)
+var log = logging.Instance
 
 func main() {
-	ch := musiccast.StartScan()
+	defer logging.Close()
 	defer musiccast.Close()
+	ch := musiccast.StartScan()
 	for {
 		select {
 		case update := <-ch:
 			if Speakers[update.ID] == nil {
 				if update.PartialUpdate {
-					fmt.Println("Ignore event for unknown MusicCast speaker")
+					log.Debug("Ignore event for unknown MusicCast speaker")
 					continue
 				}
-				fmt.Println("Found new MusicCast speaker", update)
+				log.Info("Found new MusicCast speaker", update)
 				Speakers[update.ID] = update
 			} else {
-				fmt.Println("Got MusicCast speaker update", update)
+				log.Debug("Got MusicCast speaker update", update)
 				if update.PartialUpdate {
 					update.UpdateValues(Speakers[update.ID])
 				} else {
@@ -32,7 +35,7 @@ func main() {
 				}
 			}
 		default:
-			fmt.Println("Nothing found - sleep")
+			log.Debug("Nothing found - sleep")
 			time.Sleep(500 * time.Millisecond)
 		}
 		drawUi()
@@ -40,7 +43,8 @@ func main() {
 }
 
 func drawUi() {
-	println("List of Speakers:\n---")
+	fmt.Println("\033[H\033[2J")
+	fmt.Println("List of Speakers:\n---")
 	items := make([]string, 0)
 	for _, spkr := range Speakers {
 		items = append(items, spkr.FriendlyName+": "+string(spkr.Power))

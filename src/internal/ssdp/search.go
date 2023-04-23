@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/atamanroman/ymc/src/internal/logging"
 	"github.com/atamanroman/ymc/src/internal/ssdp/multicast"
-	"github.com/atamanroman/ymc/src/internal/ssdp/ssdplog"
 	"net"
 	"net/http"
 	"time"
@@ -29,7 +29,7 @@ func Search(searchType string, waitSec int, ch chan<- *Service) error {
 		return err
 	}
 	defer conn.Close()
-	ssdplog.Printf("search on %s", conn.LocalAddr().String())
+	logging.Instance.Debugf("search on %s", conn.LocalAddr().String())
 
 	// send request.
 	addr, err := multicast.SendAddr()
@@ -47,10 +47,10 @@ func Search(searchType string, waitSec int, ch chan<- *Service) error {
 	h := func(a net.Addr, d []byte) error {
 		srv, err := parseService(a, d)
 		if err != nil {
-			ssdplog.Printf("invalid search response from %s: %s", a.String(), err)
+			logging.Instance.Debugf("invalid search response from %s: %s", a.String(), err)
 			return nil
 		}
-		ssdplog.Printf("search response from %s: %s", a.String(), srv.USN)
+		logging.Instance.Debugf("search response from %s: %s", a.String(), srv.USN)
 		ch <- srv
 		return nil
 	}

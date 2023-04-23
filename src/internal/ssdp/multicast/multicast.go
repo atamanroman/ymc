@@ -2,13 +2,12 @@ package multicast
 
 import (
 	"errors"
-	"github.com/atamanroman/ymc/src/internal/ssdp/ssdplog"
+	"github.com/atamanroman/ymc/src/internal/logging"
+	"golang.org/x/net/ipv4"
 	"io"
 	"net"
 	"strings"
 	"time"
-
-	"golang.org/x/net/ipv4"
 )
 
 // Conn is multicast connection.
@@ -69,11 +68,11 @@ func joinGroupIPv4(conn *net.UDPConn, iflist []net.Interface, gaddr net.Addr) (*
 	joined := 0
 	for _, ifi := range iflist {
 		if err := wrap.JoinGroup(&ifi, gaddr); err != nil {
-			ssdplog.Printf("failed to join group %s on %s: %s", gaddr.String(), ifi.Name, err)
+			logging.Instance.Debugf("failed to join group %s on %s: %s", gaddr.String(), ifi.Name, err)
 			continue
 		}
 		joined++
-		ssdplog.Printf("joined group %s on %s (#%d)", gaddr.String(), ifi.Name, ifi.Index)
+		logging.Instance.Debugf("joined group %s on %s (#%d)", gaddr.String(), ifi.Name, ifi.Index)
 	}
 	if joined == 0 {
 		return nil, errors.New("no interfaces had joined to group")

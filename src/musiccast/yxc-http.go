@@ -109,11 +109,11 @@ func getDeviceInfo(device *Speaker, appPort int) (*deviceInfoResponse, error) {
 
 func subscribeEvents(appPort int, request *http.Request) {
 	if appPort > 0 {
-		fmt.Println("Subscribe to MusicCast events on port", appPort)
+		log.Infof("Subscribe to MusicCast events on port=%d", appPort)
 		request.Header.Add("X-AppName", "MusicCast/CLI")
 		request.Header.Add("X-AppPort", strconv.Itoa(appPort))
 	} else {
-		fmt.Println("Skip MusicCast event subscription")
+		log.Info("Skip MusicCast event subscription")
 	}
 }
 

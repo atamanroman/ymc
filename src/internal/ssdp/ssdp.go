@@ -3,32 +3,26 @@ package ssdp
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
+	"github.com/atamanroman/ymc/src/internal/logging"
 	"github.com/atamanroman/ymc/src/internal/ssdp/multicast"
-	"github.com/atamanroman/ymc/src/internal/ssdp/ssdplog"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"regexp"
 	"strconv"
 )
 
+var log = logging.Instance
+
 func init() {
 	multicast.InterfacesProvider = func() []net.Interface {
 		return Interfaces
-	}
-	ssdplog.LoggerProvider = func() *log.Logger {
-		return Logger
 	}
 }
 
 // Interfaces specify target interfaces to multicast.  If no interfaces are
 // specified, all interfaces will be used.
 var Interfaces []net.Interface
-
-// Logger is default logger for SSDP module.
-var Logger *log.Logger
 
 type MediaRenderer struct {
 	XMLName xml.Name `xml:"root"`
@@ -113,13 +107,12 @@ func SetMulticastRecvAddrIPv4(addr string) error {
 }
 
 func GetMediaRenderer(device *Service) (*MediaRenderer, error) {
-	fmt.Printf("Fetch SSDP info for %v from %v", device.USN, device.Location)
+	log.Debugf("Fetch SSDP info for %v from %v", device.USN, device.Location)
 	resp, err := http.Get(device.Location)
 	if err != nil {
 		return nil, err
 	}
 	all, err := io.ReadAll(resp.Body)
-	//fmt.Println(string(all))
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
