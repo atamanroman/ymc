@@ -1,5 +1,9 @@
 ###
 
+GET {{target}}:49154/MediaRenderer/desc.xml
+
+###
+
 GET {{target}}/YamahaExtendedControl/v1/system/getFeatures
 
 ###
