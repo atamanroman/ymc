@@ -132,7 +132,7 @@ My references:
 
 - sniffing on the MusicCast device and iOS App traffic
 - *Yamaha_Extended_Control_API_Specification_(Basic).pdf*
-- *UPnP-arch-DeviceArchitecture-v2.0.pdf*
+- [UPnP-arch-DeviceArchitecture-v2.0.pdf](https://openconnectivity.org/upnp-specs/UPnP-arch-DeviceArchitecture-v2.0-20200417.pdf)
 
 ### Packages
 
