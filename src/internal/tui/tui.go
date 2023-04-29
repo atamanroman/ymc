@@ -10,93 +10,65 @@ import (
 	"strings"
 )
 
-var App *tview.Application
-var log = logging.Instance
-var devices *tview.List
-var pages *tview.Pages
+type Action string
 
-func init() {
-	App = createUi()
+const (
+	PowerOn  Action = "PowerOn"
+	PowerOff Action = "PowerOff"
+)
+
+type SpeakerCommand struct {
+	Id     string
+	Action Action
 }
 
-func createUi() *tview.Application {
+var App *tview.Application
+var CommandChan = make(chan SpeakerCommand)
+
+var log = logging.Instance
+var speakerList *tview.List
+var mainLayout *tview.Pages
+var knownSpeakers = make([]*musiccast.Speaker, 0)
+
+func init() {
 	status := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("Status:\nfoo")
 	status.SetBackgroundColor(tcell.ColorDefault)
 
-	devices = tview.NewList()
-	devices.SetTitle("  Speakers  ")
-	//devices.SetBorder(true)
-	//devices.SetBorderPadding(1, 1, 2, 2)
-	devices.SetBackgroundColor(tcell.ColorDefault)
-	devices.SetSelectedBackgroundColor(tcell.ColorHotPink)
-	devices.SetSecondaryTextColor(tcell.ColorGrey)
-	devices.SetInputCapture(customKeys)
-	devices.SetDoneFunc(func() {
-		App.Stop()
-	})
+	speakerList = createSpeakerList()
+	columnLayout := createColumnLayout(status)
+	helpDialog := createHelpDialog()
 
-	flex := tview.NewFlex().
-		AddItem(devices, 20, 0, true).
-		AddItem(status, 0, 30, false)
-	flex.SetTitle("  ymc  ")
-	flex.SetBorder(true)
-	flex.SetBorderColor(tcell.ColorBlack)
-	flex.SetBorderPadding(1, 1, 2, 2)
-	flex.SetTitleColor(tcell.ColorHotPink)
-	flex.SetBackgroundColor(tcell.ColorDefault)
+	mainLayout = tview.NewPages()
+	mainLayout.AddPage("main", columnLayout, true, true).AddPage("help", helpDialog, true, false)
+	mainLayout.SetBackgroundColor(tcell.ColorDefault)
 
-	helpText := tview.NewTextView().SetText(
-		"→\tSelect item\n" +
-			"←\tGo back\n" +
-			"?\tShow help\n" +
-			"q\tQuit\n")
-	helpText.SetTitle("  ymc Help (?)  ")
-	helpText.SetBorder(true)
-	helpText.SetBackgroundColor(tcell.ColorDefault)
-	helpText.SetInputCapture(customKeys)
-	helpText.SetDoneFunc(func(_ tcell.Key) {
-		pages.SwitchToPage("main")
-	})
-	helpText.SetBorderPadding(1, 1, 1, 1)
-
-	// center the text
-	helpFlex := tview.NewFlex().
-		AddItem(nil, 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(nil, 0, 1, false).
-			AddItem(helpText, 9, 1, true).
-			AddItem(nil, 0, 1, false), 30, 1, true).
-		AddItem(nil, 0, 1, false)
-
-	pages = tview.NewPages()
-	pages.AddAndSwitchToPage("main", flex, true).AddPage("help", helpFlex, true, false)
-	pages.SetBackgroundColor(tcell.ColorDefault)
-
-	return tview.NewApplication().SetRoot(pages, true)
+	App = tview.NewApplication().SetRoot(mainLayout, true)
+	App.SetInputCapture(defaultKeys)
 }
-func UpdateUi(speakers map[string]*musiccast.Speaker) {
 
+func UpdateUi(updated map[string]*musiccast.Speaker) {
 	sorted := make([]*musiccast.Speaker, 0)
-	for _, spkr := range speakers {
+	for _, spkr := range updated {
 		sorted = append(sorted, spkr)
 	}
 	sort.Slice(sorted, func(a int, b int) bool {
 		return sorted[a].FriendlyName > sorted[b].FriendlyName
 	})
+	knownSpeakers = sorted
 
 	App.QueueUpdateDraw(func() {
 		for i, spkr := range sorted {
-			count := devices.GetItemCount()
+			count := speakerList.GetItemCount()
 			if i < count {
-				friendlyName, _ := devices.GetItemText(i)
+				friendlyName, _ := speakerList.GetItemText(i)
 				if withoutColor(friendlyName) == withoutColor(spkr.FriendlyName) {
-					devices.SetItemText(i, coloredFriendlyName(spkr), statusString(spkr))
+					speakerList.SetItemText(i, coloredFriendlyName(spkr), statusString(spkr))
 				} else {
-					devices.InsertItem(i, coloredFriendlyName(spkr), statusString(spkr), 0, nil)
+					speakerList.InsertItem(i, coloredFriendlyName(spkr), statusString(spkr), 0, nil)
 				}
 			} else {
 				// new item
-				devices.AddItem(coloredFriendlyName(spkr), statusString(spkr), 0, nil)
+				speakerList.AddItem(coloredFriendlyName(spkr), statusString(spkr), 0, nil)
 			}
 		}
 	})
@@ -150,16 +122,16 @@ func withoutColor(label string) string {
 	return label
 }
 
-func showHelp() {
-	pages.ShowPage("help")
-}
-
-func customKeys(event *tcell.EventKey) *tcell.EventKey {
-	switch event.Rune() {
-	case 'q':
-		return tcell.NewEventKey(tcell.KeyESC, ' ', tcell.ModNone)
-	case '?':
-		showHelp()
+func defaultKeys(event *tcell.EventKey) *tcell.EventKey {
+	switch event.Key() {
+	case tcell.KeyRune:
+		switch event.Rune() {
+		case 'q':
+			return tcell.NewEventKey(tcell.KeyESC, ' ', tcell.ModNone)
+		case '?':
+			mainLayout.ShowPage("help")
+			return event
+		}
 	}
 	return event
 }

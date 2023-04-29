@@ -44,6 +44,28 @@ func main() {
 		}
 	}()
 
+	go func() {
+		for {
+			select {
+			case command := <-tui.CommandChan:
+				switch command.Action {
+				case tui.PowerOn:
+					err := musiccast.SetPower(Speakers[command.Id], musiccast.On)
+					if err != nil {
+						// TODO
+						continue
+					}
+				case tui.PowerOff:
+					err := musiccast.SetPower(Speakers[command.Id], musiccast.Standby)
+					if err != nil {
+						// TODO
+						continue
+					}
+				}
+			}
+		}
+	}()
+
 	if err := tui.App.Run(); err != nil {
 		panic(err)
 	}

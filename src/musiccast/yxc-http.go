@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var httpClient = &http.Client{}
@@ -14,7 +15,7 @@ type ApiResponse interface {
 	ErrorCode() int
 }
 
-type statusResponse struct {
+type StatusResponse struct {
 	ResponseCode int    `json:"response_code"`
 	Power        Power  `json:"power"`
 	Sleep        int    `json:"sleep"`
@@ -25,7 +26,7 @@ type statusResponse struct {
 	InputText    string `json:"input_text"`
 }
 
-func (r statusResponse) ErrorCode() int {
+func (r StatusResponse) ErrorCode() int {
 	return r.ResponseCode
 }
 
@@ -34,7 +35,7 @@ func (r statusResponse) ErrorCode() int {
 // fetch the current speaker status from the device and subscribe to MusicCast events if port > 0
 func updateStatus(device *Speaker, appPort int) error {
 	// TODO dynamic zone?
-	status, err := getStatus(device, appPort)
+	status, err := GetStatus(device, appPort)
 	if err != nil {
 		return err
 	}
@@ -44,14 +45,14 @@ func updateStatus(device *Speaker, appPort int) error {
 	return nil
 }
 
-func getStatus(device *Speaker, appPort int) (*statusResponse, error) {
+func GetStatus(device *Speaker, appPort int) (*StatusResponse, error) {
 	request, _ := http.NewRequest("GET", device.BaseUrl+"YamahaExtendedControl/v1/main/getStatus", nil)
 	subscribeEvents(appPort, request)
 	resp, err := httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
-	target := statusResponse{}
+	target := StatusResponse{}
 	err = unmarshalApiResponse(resp, &target)
 	if err != nil {
 		return nil, err
@@ -59,7 +60,7 @@ func getStatus(device *Speaker, appPort int) (*statusResponse, error) {
 	return &target, nil
 }
 
-type deviceInfoResponse struct {
+type DeviceInfoResponse struct {
 	ResponseCode        int     `json:"response_code"`
 	ModelName           string  `json:"model_name"`
 	Destination         string  `json:"destination"`
@@ -77,12 +78,12 @@ type deviceInfoResponse struct {
 	UpdateDataType      int     `json:"update_data_type"`
 }
 
-func (r deviceInfoResponse) ErrorCode() int {
+func (r DeviceInfoResponse) ErrorCode() int {
 	return r.ResponseCode
 }
 
 func updateDeviceInfo(device *Speaker, appPort int) error {
-	deviceInfo, err := getDeviceInfo(device, appPort)
+	deviceInfo, err := GetDeviceInfo(device, appPort)
 	if err != nil {
 		return err
 	}
@@ -92,19 +93,33 @@ func updateDeviceInfo(device *Speaker, appPort int) error {
 	return nil
 }
 
-func getDeviceInfo(device *Speaker, appPort int) (*deviceInfoResponse, error) {
-	request, _ := http.NewRequest("GET", device.BaseUrl+"YamahaExtendedControl/v1/system/getDeviceInfo", nil)
+func GetDeviceInfo(device *Speaker, appPort int) (*DeviceInfoResponse, error) {
+	request, _ := http.NewRequest(http.MethodGet, device.BaseUrl+"YamahaExtendedControl/v1/system/getDeviceInfo", nil)
 	subscribeEvents(appPort, request)
 	resp, err := httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
-	target := deviceInfoResponse{}
+	target := DeviceInfoResponse{}
 	err = unmarshalApiResponse(resp, &target)
 	if err != nil {
 		return nil, err
 	}
 	return &target, nil
+}
+
+func SetPower(device *Speaker, power Power) error {
+	request, _ := http.NewRequest(http.MethodGet, device.BaseUrl+"YamahaExtendedControl/v1/main/setPower?power="+strings.ToLower(string(power)), nil)
+	resp, err := httpClient.Do(request)
+	if err != nil {
+		return err
+	}
+	target := StatusResponse{}
+	err = unmarshalApiResponse(resp, &target)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func subscribeEvents(appPort int, request *http.Request) {
