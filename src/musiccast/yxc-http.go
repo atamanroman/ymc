@@ -42,6 +42,9 @@ func updateStatus(device *Speaker, appPort int) error {
 	device.Power = status.Power
 	device.Volume = status.Volume
 	device.MaxVolume = status.MaxVolume
+	device.InputText = status.InputText
+	device.Input = status.Input
+	device.Mute = status.Mute
 	return nil
 }
 

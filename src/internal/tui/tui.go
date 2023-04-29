@@ -81,6 +81,8 @@ func statusString(speaker *musiccast.Speaker) string {
 
 	var bars string
 	if speaker.Volume == 0 {
+		bars = "0"
+	} else if speaker.Mute {
 		bars = "⨯"
 	} else {
 		volPercent := float32(speaker.Volume) / float32(speaker.MaxVolume)
@@ -102,7 +104,13 @@ func statusString(speaker *musiccast.Speaker) string {
 			bars = ""
 		}
 	}
-	return fmt.Sprintf("  ⏵⏸ Spotify %s", bars)
+	var input string
+	if speaker.InputText != "" {
+		input = speaker.InputText
+	} else {
+		input = "???"
+	}
+	return fmt.Sprintf("  ⏵⏸ %s %s", input, bars)
 }
 
 func coloredFriendlyName(speaker *musiccast.Speaker) string {

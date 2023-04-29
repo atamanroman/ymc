@@ -34,7 +34,11 @@ type Speaker struct {
 	DeviceType         string
 	Volume             int8
 	MaxVolume          int8
-	PartialUpdate      bool
+	InputText          string
+	Input              string
+	Mute               bool
+
+	PartialUpdate bool
 }
 
 func (o Speaker) String() string {
@@ -160,7 +164,7 @@ func mediaRendererToMusicCast(mediaRendererChan <-chan *ssdp.Service, speakerCha
 			log.Infof("Found SSDP Service: %v\n", service)
 			mediaRenderer, _ := ssdp.GetMediaRenderer(service)
 			if isYamahaMusicCast(mediaRenderer) {
-				var spkr = Speaker{mediaRenderer.Device.UDN, Standby, mediaRenderer.XDevice.UrlBase, "?", "?", mediaRenderer.Device.FriendlyName, mediaRenderer.Device.ModelName, 0, 100, false}
+				var spkr = Speaker{mediaRenderer.Device.UDN, Standby, mediaRenderer.XDevice.UrlBase, "?", "?", mediaRenderer.Device.FriendlyName, mediaRenderer.Device.ModelName, 0, 100, "", "", false, false}
 				err := updateStatus(&spkr, musicCastEventPort)
 				if err != nil {
 					log.Warn("Failed to get status for device:", spkr.FriendlyName, err)
