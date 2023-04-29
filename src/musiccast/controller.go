@@ -50,6 +50,11 @@ func (o Speaker) UpdateValues(target *Speaker) {
 		target.Power = o.Power
 	}
 
+	// TODO 0 is a valid value!
+	if o.Volume > 0 {
+		target.Volume = o.Volume
+	}
+
 	// TODO
 }
 
@@ -58,7 +63,8 @@ type ZonedStatusEvent struct {
 	Main StatusEvent `json:"main"`
 }
 type StatusEvent struct {
-	Power Power `json:"power"`
+	Power  Power `json:"power"`
+	Volume *int8 `json:"volume"`
 }
 
 func (o ZonedStatusEvent) String() string {
@@ -131,6 +137,14 @@ func StartScan() <-chan *Speaker {
 			spkr.PartialUpdate = true
 			if event.Main.Power != "" {
 				spkr.Power = event.Main.Power
+			}
+
+			if event.Main.Power != "" {
+				spkr.Power = event.Main.Power
+			}
+
+			if event.Main.Volume != nil {
+				spkr.Volume = *event.Main.Volume
 			}
 
 			speakerChan <- &spkr

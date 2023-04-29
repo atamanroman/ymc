@@ -1,0 +1,14 @@
+2023-04-29T02:04:26.731+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.30:33778: uuid:9ab0c000-f668-11de-9976-78dd12028a80::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:04:32.133+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.33:36861: uuid:9ab0c000-f668-11de-9976-ac44f285746b::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:05:13.965+0200	DEBUG	multicast/multicast.go:75	joined group 239.255.255.250:1900 on lo0 (#1)
+2023-04-29T02:05:13.965+0200	DEBUG	multicast/multicast.go:75	joined group 239.255.255.250:1900 on en0 (#6)
+2023-04-29T02:05:13.965+0200	DEBUG	multicast/multicast.go:75	joined group 239.255.255.250:1900 on utun10 (#21)
+2023-04-29T02:05:13.965+0200	DEBUG	multicast/multicast.go:75	joined group 239.255.255.250:1900 on utun11 (#24)
+2023-04-29T02:05:13.966+0200	DEBUG	ssdp/search.go:32	search on 0.0.0.0:0
+2023-04-29T02:05:14.098+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.20:35644: uuid:9ab0c000-f668-11de-9976-78dd12157974::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:06:21.554+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.28:57584: uuid:F00DBABE-AA5E-BABA-DADA-0000000039D6::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:06:25.127+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.20:35644: uuid:9ab0c000-f668-11de-9976-78dd12157974::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:06:25.148+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.30:33778: uuid:9ab0c000-f668-11de-9976-78dd12028a80::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:06:34.749+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.33:36861: uuid:9ab0c000-f668-11de-9976-ac44f285746b::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:07:02.050+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.30:33778: uuid:9ab0c000-f668-11de-9976-78dd12028a80::urn:schemas-upnp-org:device:MediaRenderer:1
+2023-04-29T02:07:44.001+0200	DEBUG	ssdp/search.go:53	search response from 192.168.178.30:33778: uuid:9ab0c000-f668-11de-9976-78dd12028a80::urn:schemas-upnp-org:device:MediaRenderer:1

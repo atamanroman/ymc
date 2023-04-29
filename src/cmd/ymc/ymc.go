@@ -1,56 +1,48 @@
 package main
 
 import (
-	"fmt"
 	"github.com/atamanroman/ymc/src/internal/logging"
+	"github.com/atamanroman/ymc/src/internal/tui"
 	"github.com/atamanroman/ymc/src/musiccast"
-	"sort"
 	"time"
 )
 
-var Speakers = make(map[string]*musiccast.Speaker)
 var log = logging.Instance
+var Speakers = make(map[string]*musiccast.Speaker)
 
 func main() {
 	defer logging.Close()
 	defer musiccast.Close()
 	ch := musiccast.StartScan()
-	for {
-		select {
-		case update := <-ch:
-			if Speakers[update.ID] == nil {
-				if update.PartialUpdate {
-					log.Debug("Ignore event for unknown MusicCast speaker")
-					continue
-				}
-				log.Info("Found new MusicCast speaker", update)
-				Speakers[update.ID] = update
-			} else {
-				log.Debug("Got MusicCast speaker update", update)
-				if update.PartialUpdate {
-					update.UpdateValues(Speakers[update.ID])
-				} else {
-					// full update
+	go func() {
+		for {
+			select {
+			case update := <-ch:
+				if Speakers[update.ID] == nil {
+					if update.PartialUpdate {
+						log.Debug("Ignore event for unknown MusicCast speaker")
+						continue
+					}
+					log.Info("Found new MusicCast speaker", update)
 					Speakers[update.ID] = update
+				} else {
+					log.Debug("Got MusicCast speaker update", update)
+					if update.PartialUpdate {
+						update.UpdateValues(Speakers[update.ID])
+					} else {
+						// full update
+						Speakers[update.ID] = update
+					}
 				}
+			default:
+				log.Debug("Nothing found - sleep")
+				time.Sleep(500 * time.Millisecond)
 			}
-		default:
-			log.Debug("Nothing found - sleep")
-			time.Sleep(500 * time.Millisecond)
-		}
-		drawUi()
-	}
-}
 
-func drawUi() {
-	fmt.Println("\033[H\033[2J")
-	fmt.Println("List of Speakers:\n---")
-	items := make([]string, 0)
-	for _, spkr := range Speakers {
-		items = append(items, spkr.FriendlyName+": "+string(spkr.Power))
-	}
-	sort.Strings(items)
-	for idx, spkr := range items {
-		fmt.Println("(", idx, ")", spkr)
+			tui.UpdateUi(Speakers)
+		}
+	}()
+	if err := tui.App.Run(); err != nil {
+		panic(err)
 	}
 }

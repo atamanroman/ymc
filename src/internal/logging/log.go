@@ -8,7 +8,15 @@ import (
 var Instance *zap.SugaredLogger
 
 func init() {
+	buildLogger("")
+}
+
+func buildLogger(output string) {
 	config := zap.NewDevelopmentConfig()
+	config.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
+	if output != "" {
+		config.OutputPaths = []string{output}
+	}
 	build, err := config.Build()
 	if err != nil {
 		panic(fmt.Errorf("zap logger setup failed: %w", err))
