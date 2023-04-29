@@ -101,14 +101,13 @@ func init() {
 
 func StartScan() <-chan *Speaker {
 	go func() {
-		for {
-			log.Info("Send SSDP MediaRender discovery every 10s ")
-			err := ssdp.Search(ssdp.UpnpMediaRenderer, 10, ssdpChan)
+		// multiple times because sometimes speakers seem to be a bit unreliable
+		for i := 0; i < 5; i++ {
+			log.Info("Send SSDP M-Search ")
+			err := ssdp.Search(ssdp.UpnpMediaRenderer, 1, ssdpChan)
 			if err != nil {
-				panic(fmt.Errorf("MusicCast discovery failed: %w", err))
+				panic(fmt.Errorf("SSDP M-Search failed: %w", err))
 			}
-			// discover every 10s so we can find new devices
-			time.Sleep(10 * time.Second)
 		}
 	}()
 	go func() {
