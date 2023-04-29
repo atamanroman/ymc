@@ -14,6 +14,7 @@ func main() {
 	defer logging.Close()
 	defer musiccast.Close()
 	ch := musiccast.StartScan()
+
 	go func() {
 		for {
 			select {
@@ -42,6 +43,7 @@ func main() {
 			tui.UpdateUi(Speakers)
 		}
 	}()
+
 	if err := tui.App.Run(); err != nil {
 		panic(err)
 	}

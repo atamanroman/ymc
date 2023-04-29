@@ -13,6 +13,7 @@ import (
 var App *tview.Application
 var log = logging.Instance
 var devices *tview.List
+var pages *tview.Pages
 
 func init() {
 	App = createUi()
@@ -29,6 +30,10 @@ func createUi() *tview.Application {
 	devices.SetBackgroundColor(tcell.ColorDefault)
 	devices.SetSelectedBackgroundColor(tcell.ColorHotPink)
 	devices.SetSecondaryTextColor(tcell.ColorGrey)
+	devices.SetInputCapture(customKeys)
+	devices.SetDoneFunc(func() {
+		App.Stop()
+	})
 
 	flex := tview.NewFlex().
 		AddItem(devices, 20, 0, true).
@@ -39,7 +44,35 @@ func createUi() *tview.Application {
 	flex.SetBorderPadding(1, 1, 2, 2)
 	flex.SetTitleColor(tcell.ColorHotPink)
 	flex.SetBackgroundColor(tcell.ColorDefault)
-	return tview.NewApplication().SetRoot(flex, true)
+
+	helpText := tview.NewTextView().SetText(
+		"→\tSelect item\n" +
+			"←\tGo back\n" +
+			"?\tShow help\n" +
+			"q\tQuit\n")
+	helpText.SetTitle("  ymc Help (?)  ")
+	helpText.SetBorder(true)
+	helpText.SetBackgroundColor(tcell.ColorDefault)
+	helpText.SetInputCapture(customKeys)
+	helpText.SetDoneFunc(func(_ tcell.Key) {
+		pages.SwitchToPage("main")
+	})
+	helpText.SetBorderPadding(1, 1, 1, 1)
+
+	// center the text
+	helpFlex := tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(helpText, 9, 1, true).
+			AddItem(nil, 0, 1, false), 30, 1, true).
+		AddItem(nil, 0, 1, false)
+
+	pages = tview.NewPages()
+	pages.AddAndSwitchToPage("main", flex, true).AddPage("help", helpFlex, true, false)
+	pages.SetBackgroundColor(tcell.ColorDefault)
+
+	return tview.NewApplication().SetRoot(pages, true)
 }
 func UpdateUi(speakers map[string]*musiccast.Speaker) {
 
@@ -115,4 +148,18 @@ func withoutColor(label string) string {
 		return label[start:end]
 	}
 	return label
+}
+
+func showHelp() {
+	pages.ShowPage("help")
+}
+
+func customKeys(event *tcell.EventKey) *tcell.EventKey {
+	switch event.Rune() {
+	case 'q':
+		return tcell.NewEventKey(tcell.KeyESC, ' ', tcell.ModNone)
+	case '?':
+		showHelp()
+	}
+	return event
 }
