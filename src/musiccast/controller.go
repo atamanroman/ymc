@@ -238,9 +238,6 @@ func isYamahaMusicCast(mediaRenderer *ssdp.MediaRenderer) bool {
 }
 
 func Close() error {
-	// TODO close all sockets and stuff
-	close(ssdpChan)
-	close(speakerChan)
-	eventConnection.Close()
+	// closing eventConnection fails :>
 	return nil
 }
