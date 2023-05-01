@@ -7,27 +7,26 @@ import (
 	"strings"
 )
 
-func createColumnLayout(status *tview.TextView) *tview.Flex {
-	columnLayout := tview.NewFlex().
-		AddItem(speakerList, 20, 0, true).
-		AddItem(status, 0, 30, false)
-	columnLayout.SetTitle("  ymc  ")
-	columnLayout.SetBorder(true)
-	columnLayout.SetBorderColor(tcell.ColorBlack)
-	columnLayout.SetBorderPadding(1, 1, 2, 2)
-	columnLayout.SetTitleColor(tcell.ColorHotPink)
-	columnLayout.SetBackgroundColor(tcell.ColorDefault)
-	return columnLayout
+const (
+	transparent = tcell.ColorDefault
+	light       = tcell.ColorLightGray
+	dark        = tcell.ColorDarkGray
+	black       = tcell.ColorBlack
+	good        = tcell.ColorGrey
+	bad         = tcell.ColorRed
+	accent      = tcell.ColorHotPink
+)
+
+func createFrame() *tview.Frame {
+	frame := tview.NewFrame(speakerList)
+	frame.AddText("Speakers", true, 0, accent)
+	style(frame, "ymc")
+	return frame
 }
 
 func createSpeakerList() *tview.List {
 	devices := tview.NewList()
-	devices.SetTitle("  Speakers  ")
-	//devices.SetBorder(true)
-	//devices.SetBorderPadding(1, 1, 2, 2)
-	devices.SetBackgroundColor(tcell.ColorDefault)
-	devices.SetSelectedBackgroundColor(tcell.ColorHotPink)
-	devices.SetSecondaryTextColor(tcell.ColorGrey)
+	style(devices, "")
 	devices.SetDoneFunc(func() {
 		App.Stop()
 	})
@@ -45,6 +44,7 @@ func createSpeakerList() *tview.List {
 		index := devices.GetCurrentItem()
 		speakerId := knownSpeakers[index].ID
 		isShift := event.Modifiers()&tcell.ModShift > 0
+
 		switch event.Key() {
 		case tcell.KeyLeft:
 			value := 5
@@ -87,13 +87,11 @@ q              Quit
 *Shift: small steps
 `)
 	helpText := tview.NewTextView().SetText(help)
-	helpText.SetTitle("  ymc Help (?)  ")
-	helpText.SetBorder(true)
-	helpText.SetBackgroundColor(tcell.ColorDefault)
+
+	style(helpText, "Help (?)")
 	helpText.SetDoneFunc(func(_ tcell.Key) {
 		mainLayout.SwitchToPage("main")
 	})
-	helpText.SetBorderPadding(1, 1, 1, 1)
 
 	// center the text
 	helpFlex := tview.NewFlex().
@@ -104,4 +102,36 @@ q              Quit
 			AddItem(nil, 0, 1, false), 23, 1, true).
 		AddItem(nil, 0, 1, false)
 	return helpFlex
+}
+
+func style(layout any, title string) {
+	switch x := layout.(type) {
+	case *tview.Frame:
+		if title != "" {
+			x.SetTitle("  " + title + "  ")
+		}
+		x.SetBorder(true)
+		x.SetBorderColor(black)
+		x.SetTitleColor(accent)
+		x.SetBackgroundColor(transparent)
+	case *tview.TextView:
+		if title != "" {
+			x.SetTitle("  " + title + "  ")
+		}
+		x.SetBorder(true)
+		x.SetBorderColor(light)
+		x.SetTitleColor(accent)
+		x.SetBackgroundColor(transparent)
+		x.SetBorderPadding(1, 1, 1, 1)
+	case *tview.List:
+		if title != "" {
+			x.SetTitle("  " + title + "  ")
+		}
+		x.SetBorder(false)
+		x.SetBorderColor(light)
+		x.SetBackgroundColor(transparent)
+		x.SetSelectedBackgroundColor(accent)
+		x.SetSecondaryTextColor(light)
+		x.SetMainTextColor(dark)
+	}
 }

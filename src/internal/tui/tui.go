@@ -36,15 +36,12 @@ var mainLayout *tview.Pages
 var knownSpeakers = make([]*musiccast.Speaker, 0)
 
 func init() {
-	status := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetText("Status:\nfoo")
-	status.SetBackgroundColor(tcell.ColorDefault)
-
 	speakerList = createSpeakerList()
-	columnLayout := createColumnLayout(status)
+	mainFrame := createFrame()
 	helpDialog := createHelpDialog()
 
 	mainLayout = tview.NewPages()
-	mainLayout.AddPage("main", columnLayout, true, true).AddPage("help", helpDialog, true, false)
+	mainLayout.AddPage("main", mainFrame, true, true).AddPage("help", helpDialog, true, false)
 	mainLayout.SetBackgroundColor(tcell.ColorDefault)
 
 	App = tview.NewApplication().SetRoot(mainLayout, true)
@@ -101,16 +98,16 @@ func statusString(speaker *musiccast.Speaker) string {
 	} else {
 		input = "???"
 	}
+
 	// TODO play pause check
 	return fmt.Sprintf("  ⏵⏸ %s %s", input, volume)
 }
 
 func coloredFriendlyName(speaker *musiccast.Speaker) string {
 	if speaker.Power == musiccast.Standby {
-		return "[darkgray]" + speaker.FriendlyName + "[white]"
+		return speaker.FriendlyName
 	}
-	return "[green]" + speaker.FriendlyName + "[white]"
-
+	return "[green]" + speaker.FriendlyName + "[default]"
 }
 
 func withoutColor(label string) string {
