@@ -4,10 +4,10 @@ Basic controls for your MusicCast speakers from the terminal.
 
 Features:
 
-- discovery (🏗)
-- power on/off (🏗)
+- discovery
+- power on/off
 - switch inputs (🏗)
-- volume control (🏗)
+- volume control
 
 ## Installation
 
@@ -19,9 +19,19 @@ Features:
 
 TODO
 
-## Configuration
+## Usage
 
-🏗
+```text
+RET     Turn on/off
+→        Volume up*
+←      Volume down*
+m       Toggle mute
+
+?         Show help
+q              Quit
+
+*Shift: small steps
+```
 
 ## Build and Run
 
@@ -76,22 +86,28 @@ TLDR:
 
 ### About UPnP, SSDP and YXC
 
-_Disclaimer: My knowledge of UPnP and the underlying network protocols is pretty limited, but maybe it makes sense to describe my current understanding briefly._
+_Disclaimer: My knowledge of UPnP and the underlying network protocols is pretty limited, but maybe it makes sense to
+describe my current understanding briefly._
 
-Yamaha MusicCast speakers are [UPnP (Universal Plug and Play)](https://en.wikipedia.org/wiki/Universal_Plug_and_Play) devices.
+Yamaha MusicCast speakers are [UPnP (Universal Plug and Play)](https://en.wikipedia.org/wiki/Universal_Plug_and_Play)
+devices.
 UPnP handles things like discovery, description, control and eventing.
-It's built on IP uni-/multicast, UDP higher level protocols like [SSDP (Simple Service Discovery Protocol)](https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol) and [HTTPU (HTTP)](https://en.wikipedia.org/wiki/Universal_Plug_and_Play#Protocol).
+It's built on IP uni-/multicast, UDP higher level protocols
+like [SSDP (Simple Service Discovery Protocol)](https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol)
+and [HTTPU (HTTP)](https://en.wikipedia.org/wiki/Universal_Plug_and_Play#Protocol).
 
 UPnP devices advertise their services on start and then regularly and broadcast events for status changes.
 
 Then the UPnP controller (ymc) fetches the UPnP description from the device to learn what services it has to offer.
-ymc only looks for `urn:schemas-upnp-org:device:MediaRenderer:1` devices from manufacturer _Yamaha Corporation_ with model _MusicCast_.
+ymc only looks for `urn:schemas-upnp-org:device:MediaRenderer:1` devices from manufacturer _Yamaha Corporation_ with
+model _MusicCast_.
 
 The UPnP description contains everything needed to control the UPnP services from this device.
 
 MusicCast devices extend the XML `<device>` description with an additional `<yamaha:X_device>` element:
 
 ```xml
+
 <yamaha:X_device>
   <yamaha:X_URLBase>http://192.168.178.20:80/</yamaha:X_URLBase>
   <yamaha:X_serviceList>
@@ -109,13 +125,16 @@ MusicCast devices extend the XML `<device>` description with an additional `<yam
 </yamaha:X_device>
 ```
 
-This is where the MusicCast Controller (like the iOS App) leaves the UPnP track and starts controlling the device with the YXC (Yamaha Extended Control) HTTP API.
+This is where the MusicCast Controller (like the iOS App) leaves the UPnP track and starts controlling the device with
+the YXC (Yamaha Extended Control) HTTP API.
 The state of the MusicCast device can be queried and manipulated over YXC.
 It also offers a proprietary (?) unicast UDP stream a controller can register itself on to get status updates.
 
 Unfortunately, there seems to be no official source for the YXC spec (which exists in a basic and advanced version).
-Different versions of the PDFs are available though and reverse engineering the HTTP API (very not-RESTful) is easy enough.
-And there's a lot of OSS sample code on GitHub like [Yamaha MusicCast Binding](https://github.com/coop-git/YamahaMusicCast).
+Different versions of the PDFs are available though and reverse engineering the HTTP API (very not-RESTful) is easy
+enough.
+And there's a lot of OSS sample code on GitHub
+like [Yamaha MusicCast Binding](https://github.com/coop-git/YamahaMusicCast).
 
 This is enough to build a simple CLI controller which can search for devices and manipulate power, inputs and volume.
 
@@ -124,7 +143,8 @@ Advanced MusicCast features like zones and linking are (as of today) out of scop
 - don't use those features regularly and can always fall back to the app.
 - do not own an MusicCast enabled AV receiver, which seems to be required for zones.
 
-There's also the Yamaha Remote Control API (see [tryptophane/yamaha-remote](https://github.com/tryptophane/yamaha-remote)).
+There's also the Yamaha Remote Control API (
+see [tryptophane/yamaha-remote](https://github.com/tryptophane/yamaha-remote)).
 The `/YamahaRemoteControl/desc.xml` file gives 404 on my speakers, though.
 Could be only enabled on AV receivers, but then it's strange that they advertise the service.
 

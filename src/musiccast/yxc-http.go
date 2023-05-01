@@ -243,8 +243,12 @@ func SetPower(speaker *Speaker, power Power) error {
 	return nil
 }
 
-func SetVolume(speaker *Speaker, direction Volume) error {
-	request, _ := http.NewRequest(http.MethodGet, speaker.BaseUrl+"YamahaExtendedControl/v1/main/setVolume?volume="+strings.ToLower(string(direction)), nil)
+func SetVolume(speaker *Speaker, direction Volume, step int) error {
+	url := speaker.BaseUrl + "YamahaExtendedControl/v1/main/setVolume?volume=" + strings.ToLower(string(direction))
+	if step > 1 {
+		url += "&step=" + strconv.Itoa(step)
+	}
+	request, _ := http.NewRequest(http.MethodGet, url, nil)
 	resp, err := httpClient.Do(request)
 	if err != nil {
 		return err

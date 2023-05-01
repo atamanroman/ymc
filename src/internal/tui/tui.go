@@ -24,6 +24,7 @@ const (
 type SpeakerCommand struct {
 	Id     string
 	Action Action
+	Value  any
 }
 
 var App *tview.Application
@@ -100,6 +101,7 @@ func statusString(speaker *musiccast.Speaker) string {
 	} else {
 		input = "???"
 	}
+	// TODO play pause check
 	return fmt.Sprintf("  ⏵⏸ %s %s", input, volume)
 }
 

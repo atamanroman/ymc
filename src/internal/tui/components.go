@@ -4,6 +4,7 @@ import (
 	"github.com/atamanroman/ymc/src/musiccast"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"strings"
 )
 
 func createColumnLayout(status *tview.TextView) *tview.Flex {
@@ -43,17 +44,26 @@ func createSpeakerList() *tview.List {
 	devices.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		index := devices.GetCurrentItem()
 		speakerId := knownSpeakers[index].ID
+		isShift := event.Modifiers()&tcell.ModShift > 0
 		switch event.Key() {
 		case tcell.KeyLeft:
-			CommandChan <- SpeakerCommand{speakerId, VolumeDown}
+			value := 5
+			if isShift {
+				value = 1
+			}
+			CommandChan <- SpeakerCommand{speakerId, VolumeDown, value}
 			return nil
 		case tcell.KeyRight:
-			CommandChan <- SpeakerCommand{speakerId, VolumeUp}
+			value := 5
+			if isShift {
+				value = 1
+			}
+			CommandChan <- SpeakerCommand{speakerId, VolumeUp, value}
 			return nil
 		case tcell.KeyRune:
 			switch event.Rune() {
 			case 'm':
-				CommandChan <- SpeakerCommand{speakerId, MuteToggle}
+				CommandChan <- SpeakerCommand{speakerId, MuteToggle, nil}
 				return nil
 			}
 		}
@@ -64,13 +74,19 @@ func createSpeakerList() *tview.List {
 }
 
 func createHelpDialog() *tview.Flex {
-	helpText := tview.NewTextView().SetText(
-		"RET\tTurn on/off\n" +
-			"→\t\tVolume up\n" +
-			"←\t\tVolume down\n" +
-			"m\t\tToggle mute\n" +
-			"?\t\tShow help\n" +
-			"q\t\tQuit\n")
+	// 19 chars wide
+	help := strings.TrimSpace(`
+RET     Turn on/off
+→        Volume up*
+←      Volume down*
+m       Toggle mute
+
+?         Show help
+q              Quit
+
+*Shift: small steps
+`)
+	helpText := tview.NewTextView().SetText(help)
 	helpText.SetTitle("  ymc Help (?)  ")
 	helpText.SetBorder(true)
 	helpText.SetBackgroundColor(tcell.ColorDefault)
@@ -84,8 +100,8 @@ func createHelpDialog() *tview.Flex {
 		AddItem(nil, 0, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(nil, 0, 1, false).
-			AddItem(helpText, 9, 1, true).
-			AddItem(nil, 0, 1, false), 30, 1, true).
+			AddItem(helpText, 13, 1, true).
+			AddItem(nil, 0, 1, false), 23, 1, true).
 		AddItem(nil, 0, 1, false)
 	return helpFlex
 }

@@ -63,13 +63,13 @@ func main() {
 						continue
 					}
 				case tui.VolumeUp:
-					err := musiccast.SetVolume(speaker, musiccast.Up)
+					err := musiccast.SetVolume(speaker, musiccast.Up, command.Value.(int))
 					if err != nil {
 						// TODO
 						continue
 					}
 				case tui.VolumeDown:
-					err := musiccast.SetVolume(speaker, musiccast.Down)
+					err := musiccast.SetVolume(speaker, musiccast.Down, command.Value.(int))
 					if err != nil {
 						// TODO
 						continue
