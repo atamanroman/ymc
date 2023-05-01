@@ -49,6 +49,12 @@ func main() {
 			select {
 			case command := <-tui.CommandChan:
 				speaker := Speakers[command.Id]
+
+				// don't control standby speakers except power them on
+				if speaker.Power == musiccast.Standby && command.Action != tui.PowerOn {
+					continue
+				}
+
 				switch command.Action {
 				case tui.PowerOn:
 					err := musiccast.SetPower(speaker, musiccast.On)
