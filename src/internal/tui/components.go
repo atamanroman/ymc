@@ -40,15 +40,37 @@ func createSpeakerList() *tview.List {
 		}
 		CommandChan <- SpeakerCommand{Id: speaker.ID, Action: action}
 	})
+	devices.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		index := devices.GetCurrentItem()
+		speakerId := knownSpeakers[index].ID
+		switch event.Key() {
+		case tcell.KeyLeft:
+			CommandChan <- SpeakerCommand{speakerId, VolumeDown}
+			return nil
+		case tcell.KeyRight:
+			CommandChan <- SpeakerCommand{speakerId, VolumeUp}
+			return nil
+		case tcell.KeyRune:
+			switch event.Rune() {
+			case 'm':
+				CommandChan <- SpeakerCommand{speakerId, MuteToggle}
+				return nil
+			}
+		}
+		return event
+	})
+
 	return devices
 }
 
 func createHelpDialog() *tview.Flex {
 	helpText := tview.NewTextView().SetText(
-		"→\tSelect item\n" +
-			"←\tGo back\n" +
-			"?\tShow help\n" +
-			"q\tQuit\n")
+		"RET\tTurn on/off\n" +
+			"→\t\tVolume up\n" +
+			"←\t\tVolume down\n" +
+			"m\t\tToggle mute\n" +
+			"?\t\tShow help\n" +
+			"q\t\tQuit\n")
 	helpText.SetTitle("  ymc Help (?)  ")
 	helpText.SetBorder(true)
 	helpText.SetBackgroundColor(tcell.ColorDefault)

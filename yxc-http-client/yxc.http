@@ -4,6 +4,10 @@ GET {{target}}/YamahaExtendedControl/v1/system/getFeatures
 
 ###
 
+GET {{target}}/YamahaExtendedControl/v1/system/getFuncStatus
+
+###
+
 GET {{target}}/YamahaExtendedControl/v1/system/getDeviceInfo
 
 ###
@@ -12,8 +16,16 @@ GET {{target}}/YamahaExtendedControl/v1/system/getLocationInfo
 
 ###
 
+GET {{target}}/YamahaExtendedControl/v1/system/getNameText
+
+###
+
+GET {{target}}/YamahaExtendedControl/v1/netusb/getPlayInfo
+
+###
+
 GET {{target}}/YamahaExtendedControl/v1/{{zone}}/getStatus
 
 ###
 
-GET {{target}}/YamahaExtendedControl/v1/{{zone}}/setPower?power=on
+GET {{target}}/YamahaExtendedControl/v1/{{zone}}/setPower?power=standby

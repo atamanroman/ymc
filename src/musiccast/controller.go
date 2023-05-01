@@ -24,6 +24,13 @@ const (
 	On      Power = "on"
 )
 
+type Volume string
+
+const (
+	Up   Volume = "Up"
+	Down Volume = "Down"
+)
+
 type Speaker struct {
 	ID                 string
 	Power              Power
@@ -32,11 +39,11 @@ type Speaker struct {
 	ExtendedControlUrl string
 	FriendlyName       string
 	DeviceType         string
-	Volume             int8
+	Volume             *int8
 	MaxVolume          int8
 	InputText          string
 	Input              string
-	Mute               bool
+	Mute               *bool
 
 	PartialUpdate bool
 }
@@ -55,20 +62,41 @@ func (o Speaker) UpdateValues(target *Speaker) {
 	}
 
 	// TODO 0 is a valid value!
-	if o.Volume > 0 {
+	if o.Volume != nil {
 		target.Volume = o.Volume
+	}
+
+	if o.InputText != "" {
+		target.InputText = o.InputText
+	}
+
+	if o.Input != "" {
+		target.Input = o.Input
+	}
+
+	if o.Mute != nil {
+		target.Mute = o.Mute
 	}
 
 	// TODO
 }
 
 type ZonedStatusEvent struct {
-	ID   string      `json:"device_id"`
-	Main StatusEvent `json:"main"`
+	ID     string      `json:"device_id"`
+	Main   StatusEvent `json:"main"`
+	Netusb NetusbEvent `json:"netusb"`
 }
 type StatusEvent struct {
 	Power  Power `json:"power"`
 	Volume *int8 `json:"volume"`
+	Mute   *bool `json:"mute"`
+}
+type NetusbEvent struct {
+	PlayError       *int  `json:"play_error "`
+	AccountUpdated  *bool `json:"account_updated"`
+	PlayTime        *int  `json:"play_time"`
+	PlayInfoUpdated *bool `json:"play_info_updated"`
+	ListInfoUpdated *bool `json:"list_info_updated"`
 }
 
 func (o ZonedStatusEvent) String() string {
@@ -76,6 +104,10 @@ func (o ZonedStatusEvent) String() string {
 }
 
 func (o StatusEvent) String() string {
+	return jsonStringer(o)
+}
+
+func (o NetusbEvent) String() string {
 	return jsonStringer(o)
 }
 
@@ -131,8 +163,14 @@ func StartScan() <-chan *Speaker {
 					err = errors.New("event has no ID")
 				}
 				log.Warnf("Discard broken MusicCast event: %s\nPayload:\n---\n%s\n---\n", err, string(buf[:read]))
-				return
+				continue
 			}
+
+			if event.Netusb.PlayTime != nil {
+				log.Debug("Discard play_time updates for now")
+				continue
+			}
+
 			spkr := Speaker{}
 			if event.ID != "" {
 				spkr.ID = event.ID
@@ -147,7 +185,11 @@ func StartScan() <-chan *Speaker {
 			}
 
 			if event.Main.Volume != nil {
-				spkr.Volume = *event.Main.Volume
+				spkr.Volume = event.Main.Volume
+			}
+
+			if event.Main.Mute != nil {
+				spkr.Mute = event.Main.Mute
 			}
 
 			speakerChan <- &spkr
@@ -164,7 +206,7 @@ func mediaRendererToMusicCast(mediaRendererChan <-chan *ssdp.Service, speakerCha
 			log.Infof("Found SSDP Service: %v\n", service)
 			mediaRenderer, _ := ssdp.GetMediaRenderer(service)
 			if isYamahaMusicCast(mediaRenderer) {
-				var spkr = Speaker{mediaRenderer.Device.UDN, Standby, mediaRenderer.XDevice.UrlBase, "?", "?", mediaRenderer.Device.FriendlyName, mediaRenderer.Device.ModelName, 0, 100, "", "", false, false}
+				var spkr = Speaker{mediaRenderer.Device.UDN, Standby, mediaRenderer.XDevice.UrlBase, "?", "?", mediaRenderer.Device.FriendlyName, mediaRenderer.Device.ModelName, nil, 100, "", "", nil, false}
 				err := updateStatus(&spkr, musicCastEventPort)
 				if err != nil {
 					log.Warn("Failed to get status for device:", spkr.FriendlyName, err)

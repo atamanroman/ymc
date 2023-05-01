@@ -48,15 +48,34 @@ func main() {
 		for {
 			select {
 			case command := <-tui.CommandChan:
+				speaker := Speakers[command.Id]
 				switch command.Action {
 				case tui.PowerOn:
-					err := musiccast.SetPower(Speakers[command.Id], musiccast.On)
+					err := musiccast.SetPower(speaker, musiccast.On)
 					if err != nil {
 						// TODO
 						continue
 					}
 				case tui.PowerOff:
-					err := musiccast.SetPower(Speakers[command.Id], musiccast.Standby)
+					err := musiccast.SetPower(speaker, musiccast.Standby)
+					if err != nil {
+						// TODO
+						continue
+					}
+				case tui.VolumeUp:
+					err := musiccast.SetVolume(speaker, musiccast.Up)
+					if err != nil {
+						// TODO
+						continue
+					}
+				case tui.VolumeDown:
+					err := musiccast.SetVolume(speaker, musiccast.Down)
+					if err != nil {
+						// TODO
+						continue
+					}
+				case tui.MuteToggle:
+					err := musiccast.SetMute(speaker, !*speaker.Mute)
 					if err != nil {
 						// TODO
 						continue

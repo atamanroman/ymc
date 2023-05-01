@@ -7,14 +7,18 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"sort"
+	"strconv"
 	"strings"
 )
 
 type Action string
 
 const (
-	PowerOn  Action = "PowerOn"
-	PowerOff Action = "PowerOff"
+	PowerOn    Action = "PowerOn"
+	PowerOff   Action = "PowerOff"
+	VolumeUp   Action = "VolumeUp"
+	VolumeDown Action = "VolumeDown"
+	MuteToggle Action = "MuteToggle"
 )
 
 type SpeakerCommand struct {
@@ -79,38 +83,24 @@ func statusString(speaker *musiccast.Speaker) string {
 		return "  Standby"
 	}
 
-	var bars string
-	if speaker.Volume == 0 {
-		bars = "0"
-	} else if speaker.Mute {
-		bars = "⨯"
+	var volume string
+	if *speaker.Volume == 0 {
+		volume = "◢ 0%"
+	} else if *speaker.Mute == true {
+		volume = "◢ M"
 	} else {
-		volPercent := float32(speaker.Volume) / float32(speaker.MaxVolume)
-		numBars := int(volPercent * 10 / 2)
-		switch numBars {
-		case 0:
-			bars = "▁"
-		case 1:
-			bars = "▁▃"
-		case 2:
-			bars = "▁▃▅"
-		case 3:
-			bars = "▁▃▅▇"
-		case 4:
-			bars = "▁▃▅▇"
-		case 5:
-			bars = "▇▇▇▇"
-		default:
-			bars = ""
-		}
+		// this looks nicer.. ◢ ▁▃▅▇ ◢ ▇▇▇▇ :( but too fine grained esp for the first 30%
+		volPercent := float32(*speaker.Volume) / float32(speaker.MaxVolume)
+		volume = "◢ " + strconv.Itoa(int(volPercent*100)) + "%"
 	}
+
 	var input string
 	if speaker.InputText != "" {
 		input = speaker.InputText
 	} else {
 		input = "???"
 	}
-	return fmt.Sprintf("  ⏵⏸ %s %s", input, bars)
+	return fmt.Sprintf("  ⏵⏸ %s %s", input, volume)
 }
 
 func coloredFriendlyName(speaker *musiccast.Speaker) string {
