@@ -1,7 +1,7 @@
 package tui
 
 import (
-	"github.com/atamanroman/ymc/src/musiccast"
+	"github.com/atamanroman/ymc/musiccast"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"strings"

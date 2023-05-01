@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/atamanroman/ymc/src/internal/logging"
-	"github.com/atamanroman/ymc/src/internal/tui"
-	"github.com/atamanroman/ymc/src/musiccast"
+	"github.com/atamanroman/ymc/internal/logging"
+	"github.com/atamanroman/ymc/internal/tui"
+	"github.com/atamanroman/ymc/musiccast"
 	"time"
 )
 

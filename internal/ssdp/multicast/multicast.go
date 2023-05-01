@@ -2,7 +2,7 @@ package multicast
 
 import (
 	"errors"
-	"github.com/atamanroman/ymc/src/internal/logging"
+	"github.com/atamanroman/ymc/internal/logging"
 	"golang.org/x/net/ipv4"
 	"io"
 	"net"

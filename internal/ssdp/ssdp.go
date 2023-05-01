@@ -3,8 +3,8 @@ package ssdp
 import (
 	"encoding/json"
 	"encoding/xml"
-	"github.com/atamanroman/ymc/src/internal/logging"
-	"github.com/atamanroman/ymc/src/internal/ssdp/multicast"
+	"github.com/atamanroman/ymc/internal/logging"
+	multicast2 "github.com/atamanroman/ymc/internal/ssdp/multicast"
 	"io"
 	"net"
 	"net/http"
@@ -15,7 +15,7 @@ import (
 var log = logging.Instance
 
 func init() {
-	multicast.InterfacesProvider = func() []net.Interface {
+	multicast2.InterfacesProvider = func() []net.Interface {
 		return Interfaces
 	}
 }
@@ -103,7 +103,7 @@ func (s *Service) Header() http.Header {
 // SetMulticastRecvAddrIPv4 updates multicast address where to receive packets.
 // This never fail now.
 func SetMulticastRecvAddrIPv4(addr string) error {
-	return multicast.SetRecvAddrIPv4(addr)
+	return multicast2.SetRecvAddrIPv4(addr)
 }
 
 func GetMediaRenderer(device *Service) (*MediaRenderer, error) {
@@ -129,5 +129,5 @@ func GetMediaRenderer(device *Service) (*MediaRenderer, error) {
 // SetMulticastSendAddrIPv4 updates a UDP address to send multicast packets.
 // This never fail now.
 func SetMulticastSendAddrIPv4(addr string) error {
-	return multicast.SetSendAddrIPv4(addr)
+	return multicast2.SetSendAddrIPv4(addr)
 }

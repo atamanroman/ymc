@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/atamanroman/ymc/src/internal/logging"
-	"github.com/atamanroman/ymc/src/internal/ssdp"
+	"github.com/atamanroman/ymc/internal/logging"
+	ssdp2 "github.com/atamanroman/ymc/internal/ssdp"
 	"net"
 	"strconv"
 	"strings"
@@ -120,7 +120,7 @@ func jsonStringer(obj any) string {
 	return string(str)
 }
 
-var ssdpChan = make(chan *ssdp.Service)
+var ssdpChan = make(chan *ssdp2.Service)
 var speakerChan = make(chan *Speaker)
 var eventConnection *net.UDPConn
 var eventListenerPort int
@@ -140,7 +140,7 @@ func StartScan() <-chan *Speaker {
 		// multiple times because sometimes speakers seem to be a bit unreliable
 		for i := 0; i < 5; i++ {
 			log.Info("Send SSDP M-Search ")
-			err := ssdp.Search(ssdp.UpnpMediaRenderer, 1, ssdpChan)
+			err := ssdp2.Search(ssdp2.UpnpMediaRenderer, 1, ssdpChan)
 			if err != nil {
 				panic(fmt.Errorf("SSDP M-Search failed: %w", err))
 			}
@@ -198,13 +198,13 @@ func StartScan() <-chan *Speaker {
 	return speakerChan
 }
 
-func mediaRendererToMusicCast(mediaRendererChan <-chan *ssdp.Service, speakerChan chan<- *Speaker, musicCastEventPort int) {
+func mediaRendererToMusicCast(mediaRendererChan <-chan *ssdp2.Service, speakerChan chan<- *Speaker, musicCastEventPort int) {
 	log.Info("Listen for SSDP services")
 	for {
 		select {
 		case service := <-mediaRendererChan:
 			log.Infof("Found SSDP Service: %v\n", service)
-			mediaRenderer, _ := ssdp.GetMediaRenderer(service)
+			mediaRenderer, _ := ssdp2.GetMediaRenderer(service)
 			if isYamahaMusicCast(mediaRenderer) {
 				var spkr = Speaker{mediaRenderer.Device.UDN, Standby, mediaRenderer.XDevice.UrlBase, "?", "?", mediaRenderer.Device.FriendlyName, mediaRenderer.Device.ModelName, nil, 100, "", "", nil, false}
 				err := updateStatus(&spkr, musicCastEventPort)
@@ -230,11 +230,11 @@ func mediaRendererToMusicCast(mediaRendererChan <-chan *ssdp.Service, speakerCha
 	}
 }
 
-func isYamahaMusicCast(mediaRenderer *ssdp.MediaRenderer) bool {
+func isYamahaMusicCast(mediaRenderer *ssdp2.MediaRenderer) bool {
 	return mediaRenderer != nil &&
 		mediaRenderer.Device.Manufacturer == musicCastManufacturer &&
 		mediaRenderer.Device.ModelDescription == musicCastModel &&
-		mediaRenderer.XDevice != ssdp.MediaRenderer{}.XDevice
+		mediaRenderer.XDevice != ssdp2.MediaRenderer{}.XDevice
 }
 
 func Close() error {

@@ -2,8 +2,8 @@ package tui
 
 import (
 	"fmt"
-	"github.com/atamanroman/ymc/src/internal/logging"
-	"github.com/atamanroman/ymc/src/musiccast"
+	"github.com/atamanroman/ymc/internal/logging"
+	"github.com/atamanroman/ymc/musiccast"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"sort"
