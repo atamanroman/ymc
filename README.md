@@ -1,5 +1,7 @@
 # 🔺 ymc - Yamaha MusicCast CLI
 
+![YMC Demo](./ymc-demo.gif)
+
 Basic controls for your MusicCast speakers from the terminal.
 
 Features:
