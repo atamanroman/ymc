@@ -10,7 +10,7 @@ import (
 const (
 	transparent = tcell.ColorDefault
 	light       = tcell.ColorLightGray
-	dark        = tcell.ColorDarkGray
+	dark        = tcell.ColorGray
 	black       = tcell.ColorBlack
 	good        = tcell.ColorGrey
 	bad         = tcell.ColorRed
@@ -121,6 +121,7 @@ func style(layout any, title string) {
 		x.SetBorder(true)
 		x.SetBorderColor(light)
 		x.SetTitleColor(accent)
+		x.SetTextColor(dark)
 		x.SetBackgroundColor(transparent)
 		x.SetBorderPadding(1, 1, 1, 1)
 	case *tview.List:
