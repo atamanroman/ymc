@@ -19,7 +19,9 @@ Features:
 
 ### Homebrew
 
-TODO
+For now [atamanroman/taps/ymc](https://github.com/atamanroman/homebrew-taps/blob/main/Formula/ymc.rb) is a head-only formula.
+
+`$ brew install --HEAD atamanroman/taps/ymc`
 
 ## Usage
 
