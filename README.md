@@ -1,4 +1,4 @@
-# 🔺 ymc - Yamaha MusicCast CLI
+# ymc - Yamaha MusicCast CLI
 
 ![YMC Demo](./ymc-demo.gif)
 
@@ -15,7 +15,7 @@ Features:
 
 ### Go
 
-`$ go install github.com/atamanroman/ymc@latest` (🏗)
+`$ go install github.com/atamanroman/ymc/cmd/ymc@latest`
 
 ### Homebrew
 
@@ -38,14 +38,14 @@ q              Quit
 ## Build and Run
 
 ```sh
-🔺 go build -v -o . ./...
-🔺 ./ymc
+$ go build -v ./cmd/ymc
+$ ./ymc
 ```
 
 or just run
 
 ```sh
-🔺 go run ./...
+$ go run ./...
 ```
 
 ## Contributing
