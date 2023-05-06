@@ -82,10 +82,10 @@ func statusString(speaker *musiccast.Speaker) string {
 	}
 
 	var volume string
-	if *speaker.Volume == 0 {
-		volume = "◢ 0%"
-	} else if *speaker.Mute == true {
+	if speaker.Mute != nil && *speaker.Mute == true {
 		volume = "◢ M"
+	} else if speaker.Volume == nil || *speaker.Volume == 0 {
+		volume = "◢ 0%"
 	} else {
 		// this looks nicer.. ◢ ▁▃▅▇ ◢ ▇▇▇▇ :( but too fine grained esp for the first 30%
 		volPercent := float32(*speaker.Volume) / float32(speaker.MaxVolume)
