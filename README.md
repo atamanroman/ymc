@@ -1,5 +1,8 @@
 # ymc - Yamaha MusicCast CLI
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/e5fc79b5cf0bf475b89f/maintainability)](https://codeclimate.com/github/atamanroman/ymc/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/e5fc79b5cf0bf475b89f/test_coverage)](https://codeclimate.com/github/atamanroman/ymc/test_coverage)
+
 ![YMC Demo](./ymc-demo.gif)
 
 Basic controls for your MusicCast speakers from the terminal.
