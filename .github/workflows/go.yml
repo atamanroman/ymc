@@ -25,4 +25,10 @@ jobs:
       run: go build -v ./cmd/ymc
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v -coverprofile=c.out ./...
+
+    - name: Test & publish code coverage
+      uses: paambaati/codeclimate-action@v4.0.0
+      env:
+        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+
